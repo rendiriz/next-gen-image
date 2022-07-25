@@ -17,12 +17,6 @@ RUN \
   [ -f package-lock.json ] && npm ci || \
   (echo "Lockfile not found." && exit 1)
 
-# builder
-FROM node:16-alpine AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
-
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
   PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
@@ -34,6 +28,12 @@ RUN addgroup -S pptruser && adduser -S -G pptruser pptruser \
   && chown -R pptruser:pptruser /app
 
 USER pptruser
+
+# builder
+FROM node:16-alpine AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
 
 RUN npm run build
 
