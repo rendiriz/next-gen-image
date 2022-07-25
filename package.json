@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "start:prod": "node node_modules/puppeteer/install.js && node server.js",
+    "start:prod": "node server.js",
     "lint": "next lint"
   },
   "dependencies": {
@@ -22,7 +22,6 @@
     "@types/react-dom": "18.0.6",
     "eslint": "8.20.0",
     "eslint-config-next": "12.2.3",
-    "puppeteer": "^15.5.0",
     "typescript": "4.7.4"
   }
 }

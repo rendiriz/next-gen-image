@@ -15,10 +15,21 @@ const getItem = async (req: NextApiRequest, res: NextApiResponse) => {
   let browser = null;
 
   if (process.env.AWS_EXECUTION_ENV) {
-    browser = await chromium.puppeteer.launch({
-      args: chromium.args,
-      executablePath: await chromium.executablePath,
-      headless: chromium.headless,
+    // browser = await chromium.puppeteer.launch({
+    //   args: chromium.args,
+    //   executablePath: await chromium.executablePath,
+    //   headless: chromium.headless,
+    // });
+
+    browser = await puppeteer.launch({
+      headless: true,
+      executablePath: '/usr/bin/chromium-browser',
+      args: [
+        '--no-sandbox',
+        '--headless',
+        '--disable-gpu',
+        '--disable-dev-shm-usage',
+      ],
     });
   } else {
     browser = await puppeteer.launch({
