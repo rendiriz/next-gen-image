@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import chromium from 'chrome-aws-lambda';
-import puppeteer from 'puppeteer-core';
+// import chromium from 'chrome-aws-lambda';
+import puppeteer from 'puppeteer';
 
 const getItem = async (req: NextApiRequest, res: NextApiResponse) => {
   const query = req.query;
