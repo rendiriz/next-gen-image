@@ -21,7 +21,7 @@ RUN \
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
   PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
-RUN yarn add puppeteer@13.5.0
+RUN npm install puppeteer@13.5.0
 
 RUN addgroup -S pptruser && adduser -S -G pptruser pptruser \
   && mkdir -p /home/pptruser/Downloads /app \
@@ -35,7 +35,7 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-RUN yarn build
+RUN npm run build
 
 FROM node:16-alpine AS runner
 WORKDIR /app
