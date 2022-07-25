@@ -19,7 +19,7 @@ RUN \
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
   PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
-RUN npm install puppeteer@13.5.0
+RUN npm install puppeteer --unsafe-perm=true --allow-root
 
 RUN addgroup -S pptruser && adduser -S -G pptruser pptruser \
   && mkdir -p /home/pptruser/Downloads /app \
