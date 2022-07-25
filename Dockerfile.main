@@ -13,12 +13,6 @@ RUN apk add --no-cache \
   nodejs \
   yarn
 RUN npm install -g puppeteer --unsafe-perm=true --allow-root
-RUN addgroup -S pptruser && adduser -S -G pptruser pptruser \
-  && mkdir -p /home/pptruser/Downloads /app \
-  && chown -R pptruser:pptruser /home/pptruser \
-  && chown -R pptruser:pptruser /app
-
-USER pptruser
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
