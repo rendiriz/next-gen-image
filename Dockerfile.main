@@ -1,0 +1,60 @@
+FROM node:16-alpine AS deps
+RUN apk add --no-cache \
+  libc6-compat \
+  chromium \
+  nss \
+  freetype \
+  harfbuzz \
+  ca-certificates \
+  ttf-freefont \
+  nodejs \
+  yarn
+WORKDIR /app
+
+COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
+RUN \
+  [ -f yarn.lock ] && yarn --frozen-lockfile --prod || \
+  [ -f package-lock.json ] && npm ci || \
+  [ -f pnpm-lock.yaml ] && yarn global add pnpm && pnpm fetch --prod && pnpm i -r --offline --prod || \
+  (echo "Lockfile not found." && exit 1)
+
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+  PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
+RUN yarn add puppeteer@13.5.0
+
+RUN addgroup -S pptruser && adduser -S -G pptruser pptruser \
+  && mkdir -p /home/pptruser/Downloads /app \
+  && chown -R pptruser:pptruser /home/pptruser \
+  && chown -R pptruser:pptruser /app
+
+USER pptruser
+
+FROM node:16-alpine AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+RUN yarn build
+
+FROM node:16-alpine AS runner
+WORKDIR /app
+
+ENV NODE_ENV production
+# ENV NEXT_TELEMETRY_DISABLED 1
+
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
+
+EXPOSE 3000
+
+ENV PORT 3000
+
+CMD ["node", "server.js"]
