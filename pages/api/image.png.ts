@@ -23,7 +23,7 @@ const getItem = async (req: NextApiRequest, res: NextApiResponse) => {
 
     browser = await puppeteer.launch({
       headless: true,
-      executablePath: '/usr/bin/chromium-browser',
+      executablePath: '/usr/bin/google-chrome',
       args: [
         '--no-sandbox',
         '--headless',
