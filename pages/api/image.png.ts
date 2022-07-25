@@ -1,12 +1,25 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import puppeteer from 'puppeteer';
 
+const isValidUrl = (urlString: string) => {
+  try {
+    return Boolean(new URL(urlString));
+  } catch (e) {
+    return false;
+  }
+};
+
 const getItem = async (req: NextApiRequest, res: NextApiResponse) => {
   const query = req.query;
   const { url } = query;
 
   if (!url) {
     res.status(400).json({ error: 'url is required' });
+    return;
+  }
+
+  if (!isValidUrl(url as string)) {
+    res.status(400).json({ error: 'url is invalid' });
     return;
   }
 
