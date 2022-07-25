@@ -1,13 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-// import chromium from 'chrome-aws-lambda';
 import puppeteer from 'puppeteer';
 
 const getItem = async (req: NextApiRequest, res: NextApiResponse) => {
   const query = req.query;
-  const { commit } = query;
+  const { url } = query;
 
-  if (!commit) {
-    res.status(400).json({ error: 'commit is required' });
+  if (!url) {
+    res.status(400).json({ error: 'url is required' });
     return;
   }
 
@@ -15,21 +14,14 @@ const getItem = async (req: NextApiRequest, res: NextApiResponse) => {
   let browser = null;
 
   if (process.env.AWS_EXECUTION_ENV) {
-    // browser = await chromium.puppeteer.launch({
-    //   args: chromium.args,
-    //   executablePath: await chromium.executablePath,
-    //   headless: chromium.headless,
-    // });
-
     browser = await puppeteer.launch({
-      headless: true,
-      // executablePath: '/usr/bin/google-chrome',
       args: [
         '--no-sandbox',
         '--headless',
         '--disable-gpu',
         '--disable-dev-shm-usage',
       ],
+      headless: true,
     });
   } else {
     browser = await puppeteer.launch({
@@ -47,7 +39,8 @@ const getItem = async (req: NextApiRequest, res: NextApiResponse) => {
     deviceScaleFactor: 1,
   });
 
-  await page.goto(commit as string, {
+  await page.goto(url as string, {
+    waitUntil: 'networkidle2',
     timeout: 15 * 1000,
   });
 
